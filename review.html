@@ -1,49 +1,56 @@
-
-<!doctype html><html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FixMate Reviews</title>
-<link rel="stylesheet" href="assets/app.css">
-</head><body>
-<div class="nav"><div class="logo"><div class="badge">FM</div> Reviews</div><div><a class="btn" href="index.html">Home</a><a class="btn primary" href="contractor.html">Join as Contractor</a></div></div>
-<main class="container">
-  <div class="card" style="max-width:820px;margin:0 auto">
-    <div class="section-title">Rate your contractor</div>
-    <div class="small">Use the contractor's signup email. Your review instantly appears for them and on the homepage.</div>
-    <div class="stack" style="margin-top:10px">
-      <div class="row">
-        <div><div class="small">Contractor Email</div><input id="cemail" class="input" placeholder="e.g., plumber@biz.co.za"></div>
-        <div><div class="small">Service</div><input id="svc" class="input" placeholder="e.g., Plumbing"></div>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FixMate Reviews</title>
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+  <div class="nav"><div class="logo"><div class="badge">FM</div> Reviews</div><div><a class="btn" href="index.html">Home</a><a class="btn primary" href="contractor.html">Join as Contractor</a></div></div>
+  <main class="container">
+    <div class="card" style="max-width:820px;margin:0 auto">
+      <div class="section-title">Rate your contractor</div>
+      <div class="small">Use the contractor's signup email. Your review instantly appears for them and on the homepage.</div>
+      <div class="stack" style="margin-top:10px">
+        <div class="row">
+          <div><div class="small">Contractor Email</div><input id="cemail" class="input" placeholder="e.g., plumber@biz.co.za"></div>
+          <div><div class="small">Service</div><input id="svc" class="input" placeholder="e.g., Plumbing"></div>
+        </div>
+        <div><div class="small">Your Name (optional)</div><input id="client" class="input"></div>
+        <div><div class="small">Rating</div><div id="stars"></div></div>
+        <div><div class="small">Review</div><textarea id="text" class="input" rows="3" placeholder="Tell us about the job quality, timing, price, etc."></textarea></div>
+        <div style="display:flex;justify-content:flex-end;gap:10px"><button class="btn" onclick="location='index.html'">Back</button><button class="btn primary" id="submit">Submit Review</button></div>
       </div>
-      <div><div class="small">Your Name (optional)</div><input id="client" class="input"></div>
-      <div><div class="small">Rating</div><div id="stars"></div></div>
-      <div><div class="small">Review</div><textarea id="text" class="input" rows="3" placeholder="Tell us about the job quality, timing, price, etc."></textarea></div>
-      <div style="display:flex;justify-content:flex-end;gap:10px"><button class="btn" onclick="location='index.html'">Back</button><button class="btn primary" id="submit">Submit Review</button></div>
     </div>
-  </div>
 
-  <div class="card" style="margin-top:18px">
-    <div class="section-title">Latest Reviews</div>
-    <div id="latest"></div>
-  </div>
-</main>
-<footer class="footer">© <span id="y"></span> FixMate Reviews</footer>
-<script src="assets/app.js"></script>
-<script>
-  const getStars = starControl(document.getElementById('stars'), 5);
-  document.getElementById('submit').onclick=()=>{
-    const r={ contractorEmail: cemail.value.trim(), rating: getStars(), text: text.value.trim(), clientName: client.value.trim(), service: svc.value.trim() };
-    if(!r.contractorEmail || !r.rating){ toast('Email and rating are required'); return; }
-    submitReview(r); cemail.value=client.value=svc.value=text.value=''; document.getElementById('stars').innerHTML=''; starControl(document.getElementById('stars'), 5); renderLatest();
-  };
-  function renderLatest(){
-    const el=document.getElementById('latest');
-    const rs=Reviews.all().slice(0,12);
-    el.innerHTML= rs.map(r=>`<div style="padding:10px;border-bottom:1px solid var(--border)">
-      <strong>${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</strong> — ${r.service||''}
-      <div class="small">${r.clientName||'Anonymous'} • ${r.contractorEmail} • ${pretty(r.ts)}</div>
-      <div>${r.text||''}</div>
-    </div>`).join('') || '<div class="small">No reviews yet.</div>';
-  }
-  renderLatest(); document.getElementById('y').textContent=new Date().getFullYear();
-</script>
-</body></html>
+    <div class="card" style="margin-top:18px">
+      <div class="section-title">Latest Reviews</div>
+      <div id="latest"></div>
+    </div>
+  </main>
+  <footer class="footer">© <span id="y"></span> FixMate Reviews</footer>
+
+  <script src="assets/app.js"></script>
+  <script>
+    const getStars = starControl(document.getElementById('stars'), 5);
+    document.getElementById('submit').onclick=()=>{
+      const r={ contractorEmail: cemail.value.trim(), rating: getStars(), text: text.value.trim(), clientName: client.value.trim(), service: svc.value.trim() };
+      if(!r.contractorEmail || !r.rating){ toast('Email and rating are required'); return; }
+      submitReview(r);
+      cemail.value=client.value=svc.value=text.value='';
+      document.getElementById('stars').innerHTML=''; starControl(document.getElementById('stars'), 5);
+      renderLatest();
+    };
+    function renderLatest(){
+      const el=document.getElementById('latest');
+      const rs=Reviews.all().slice(0,12);
+      el.innerHTML= rs.map(r=>`<div style="padding:10px;border-bottom:1px solid var(--border)">
+        <strong>${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</strong> — ${r.service||''}
+        <div class="small">${r.clientName||'Anonymous'} • ${r.contractorEmail} • ${pretty(r.ts)}</div>
+        <div>${r.text||''}</div>
+      </div>`).join('') || '<div class="small">No reviews yet.</div>';
+    }
+    renderLatest(); document.getElementById('y').textContent=new Date().getFullYear();
+  </script>
+</body>
+</html>
