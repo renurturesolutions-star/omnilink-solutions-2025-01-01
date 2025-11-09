@@ -1,10 +1,8 @@
-
 const $ = (s,el=document)=>el.querySelector(s);
 const $$ = (s,el=document)=>Array.from(el.querySelectorAll(s));
 function toast(t,ms=2200){const x=document.createElement('div');x.className='toast';x.textContent=t;document.body.appendChild(x);setTimeout(()=>x.remove(),ms);}
 
-// Seed 50 reviews if missing
-
+// ---- seed 50 demo reviews (once)
 const DEMO_REVIEWS = Array.from({length:50}).map((_,i)=> ({
   id: crypto.randomUUID(),
   contractorEmail: ["proplumb@fix.co.za","sparkyelec@fix.co.za","coolair@hvac.co.za","handymax@hm.co.za"][i%4],
@@ -18,7 +16,7 @@ if(!localStorage.getItem('fixmate_reviews')){
   localStorage.setItem('fixmate_reviews', JSON.stringify(DEMO_REVIEWS));
 }
 
-
+// ---- stores
 const Store = (k,init=[])=>({
   all(){return JSON.parse(localStorage.getItem(k)||JSON.stringify(init));},
   set(v){localStorage.setItem(k,JSON.stringify(v));},
@@ -37,20 +35,20 @@ function upsertContractor(c){
   Contractors.set(list);
 }
 
+// ---- chat launcher on all pages
 function mountChat(){
   if($('#chat-launcher')) return;
   const btn=document.createElement('button');btn.id='chat-launcher';btn.className='btn primary';btn.textContent='Chat';
   btn.onclick=()=>openChat(); document.body.appendChild(btn);
 }
 
+// sweeper / typing indicator
 function showSweeper(parent){
   const wrap=document.createElement('div'); wrap.className='typing';
   wrap.innerHTML=`<svg class="sweeper" width="32" height="24" viewBox="0 0 64 32" xmlns="http://www.w3.org/2000/svg">
-    <g>
-      <rect x="2" y="18" width="40" height="6" rx="3" fill="#7b61ff"/>
-      <rect x="8" y="24" width="18" height="4" rx="2" fill="#9b83ff"/>
-      <circle cx="50" cy="20" r="6" fill="#7b61ff"/>
-    </g></svg><span>FixMate is typing…</span>`;
+    <g><rect x="2" y="18" width="40" height="6" rx="3" fill="#7b61ff"/>
+    <rect x="8" y="24" width="18" height="4" rx="2" fill="#9b83ff"/>
+    <circle cx="50" cy="20" r="6" fill="#7b61ff"/></g></svg><span>FixMate is typing…</span>`;
   parent.appendChild(wrap); return wrap;
 }
 
@@ -76,7 +74,7 @@ function openChat(opts={}){
     if(i===3){ waitBot('Phone (SA 0XXXXXXXXX)?'); }
     if(i===4){ waitBot('Any notes for the contractor? (or type "skip")'); }
     if(i===5){
-      // Final question: choose a contractor if available for this service
+      // choose contractor
       const matches = Contractors.all().filter(c=> (c.primary||'').toLowerCase().includes((S.service||'').toLowerCase()) && c.token);
       if(matches.length){
         waitBot('Who would you like to choose for this job? Reply with a number:\n' + matches.map((c,idx)=>`${idx+1}. ${c.biz||c.email} (${c.areas||''})`).join('\n') + '\nOr type "best" to assign best available.');
@@ -85,7 +83,7 @@ function openChat(opts={}){
       }
     }
     if(i===6){
-      // Complete: store lead and "send" to Telegram targets (simulated)
+      // complete: store lead + queue notifications
       const lead={...S,id:crypto.randomUUID(),ts:Date.now(),status:'New',source:'chat'};
       Leads.add(lead);
       const matches = Contractors.all().filter(c=> (c.primary||'').toLowerCase().includes((S.service||'').toLowerCase()) && c.token);
@@ -96,8 +94,7 @@ function openChat(opts={}){
       const contractorMsg={type:'contractor', to: chosen? chosen.email : (matches[0]?.email||null), token: chosen? chosen.token : (matches[0]?.token||null), lead, telegramId: chosen? chosen.telegram : (matches[0]?.telegram||null)};
       Outbox.add(adminMsg); Outbox.add(contractorMsg);
       waitBot('Thanks! Your request has been sent. A contractor will contact you shortly.');
-      toast('Lead captured');
-      i++; // done
+      toast('Lead captured'); i++;
     }
   };
   step();
@@ -113,7 +110,7 @@ function openChat(opts={}){
   }
 }
 
-// Render services with icons and clickable chat
+// render services with icons
 function renderServices(target){
   const wrap=document.createElement('div');
   SERVICE_CATALOG.forEach(g=>{
@@ -128,7 +125,7 @@ function renderServices(target){
   target.innerHTML=''; target.appendChild(wrap);
 }
 
-// Reviews widgets
+// reviews widgets
 function starControl(container, initial=0){
   let value=initial;
   container.innerHTML=''; for(let i=1;i<=5;i++){
@@ -139,10 +136,11 @@ function starControl(container, initial=0){
   return ()=>value;
 }
 function submitReview(data){ const r={...data,id:crypto.randomUUID(),ts:Date.now()}; Reviews.add(r); toast('Review submitted — thank you!'); }
+
 const Auth={ login(e,p){ const ok=e&&p&&p.length>=4; if(ok) localStorage.setItem('fixmate_user',JSON.stringify({email:e})); return ok; }, user(){ return JSON.parse(localStorage.getItem('fixmate_user')||'null');}, logout(){ localStorage.removeItem('fixmate_user'); } };
 function pretty(ts){ return new Date(ts).toLocaleString(); }
 
-// Credited websites (logos) — show Approved contractors (token present)
+// credits (approved contractors show logos)
 function renderCredits(target){
   const approved = Contractors.all().filter(c=> c.token && c.logoData);
   target.innerHTML = approved.length ? approved.map(c=>`<div class="logo-card"><img src="${c.logoData}" alt="${c.biz||c.email} logo"><div class="small">${c.biz||c.email}</div></div>`).join('')
