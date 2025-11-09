@@ -1,0 +1,99 @@
+
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FixMate Contractor Dashboard</title>
+<link rel="stylesheet" href="assets/app.css">
+</head><body>
+<div class="nav">
+  <div class="logo"><div class="badge">FM</div> Dashboard</div>
+  <div>
+    <button class="btn" onclick="location='index.html'">Home</button>
+    <button class="btn" onclick="openChat()">Lead Bot</button>
+    <button class="btn" id="logout">Logout</button>
+  </div>
+</div>
+
+<main class="container">
+  <div class="card">
+    <div class="section-title">Company Token</div>
+    <div class="small">Paste the personal bot token we emailed (generated from your Telegram ID). Your logo and card will appear on the homepage once saved.</div>
+    <div class="row" style="margin-top:10px">
+      <div><div class="small">Your Email</div><input id="c-email" class="input" placeholder="must match your signup email"></div>
+      <div><div class="small">Company Token</div><input id="c-token" class="input" placeholder="paste token here"></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px">
+      <button class="btn" id="save-token">Save Token</button>
+    </div>
+    <div id="profile" style="margin-top:10px"></div>
+  </div>
+
+  <div class="row" style="margin-top:16px;grid-template-columns:2fr 1fr">
+    <div class="card">
+      <div class="section-title">Incoming Leads</div>
+      <table class="table"><thead><tr><th>Time</th><th>Name</th><th>Phone</th><th>Area</th><th>Service</th><th>Status</th><th>Action</th></tr></thead><tbody id="lead-rows"></tbody></table>
+    </div>
+    <div class="card">
+      <div class="section-title">Latest Reviews</div>
+      <div id="reviews"></div>
+    </div>
+  </div>
+</main>
+
+<script src="assets/app.js"></script>
+<script>
+  if(!Auth.user()) location='contractor-login.html';
+
+  function renderLeads(){
+    const t=document.getElementById('lead-rows');
+    const rows=Leads.all().map(l=>`<tr>
+      <td>${pretty(l.ts)}</td><td>${l.name}</td><td>${l.phone}</td>
+      <td>${l.suburb||l.area||''}</td><td>${l.service}</td>
+      <td><span class="badge-pill ${l.status==='New'?'status-new':'status-contact'}">${l.status}</span></td>
+      <td><button class="btn small" data-id="${l.id}">Mark Contacted</button></td>
+    </tr>`).join('');
+    t.innerHTML = rows || '<div class="small">No leads yet.</div>';
+    t.querySelectorAll('button').forEach(b=> b.onclick=()=>{ 
+      const id=b.dataset.id; const list=Leads.all().map(v=> v.id===id?{...v,status:'Contacted'}:v); localStorage.setItem('fixmate_leads', JSON.stringify(list)); renderLeads(); toast('Lead marked contacted'); });
+  }
+  renderLeads();
+
+  function renderReviews(){
+    const em = (document.getElementById('c-email').value||'').toLowerCase();
+    const mine = Reviews.all().filter(r=> (r.contractorEmail||'').toLowerCase()===em);
+    const el=document.getElementById('reviews');
+    el.innerHTML = mine.slice(0,8).map(r=>`
+      <div style="padding:10px;border-bottom:1px solid var(--border)">
+        <strong>${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</strong>
+        <div class="small">${r.clientName||'Anonymous'} • ${r.service||''} • ${pretty(r.ts)}</div>
+        <div>${r.text||''}</div>
+      </div>`).join('') || '<div class="small">Enter your email and save token to see your reviews here.</div>';
+  }
+
+  function renderProfileCard(){
+    const em=(document.getElementById('c-email').value||'').toLowerCase();
+    const c = Contractors.all().find(x=> (x.email||'').toLowerCase()===em);
+    const el=document.getElementById('profile');
+    if(!c){ el.innerHTML='<div class="small">No profile found. Make sure you used the signup email.</div>'; return; }
+    el.innerHTML=`
+      <div class="card" style="display:flex;gap:12px;align-items:center">
+        <img src="${c.logoData||''}" style="width:72px;height:72px;object-fit:contain;border-radius:12px;background:#0f0e1f;border:1px solid var(--border)">
+        <div style="flex:1">
+          <div><strong>${c.biz||c.email}</strong></div>
+          <div class="small">${c.primary||''} • ${c.areas||''}</div>
+          <div class="small">Telegram: ${c.telegram||'-'}</div>
+          <div class="small">Token: ${c.token? '✔ saved' : '— not saved yet'}</div>
+        </div>
+      </div>`;
+  }
+
+  document.getElementById('save-token').onclick=()=>{
+    const email=(document.getElementById('c-email').value||'').trim();
+    const token=(document.getElementById('c-token').value||'').trim();
+    if(!email || !token){ toast('Email and token required'); return; }
+    upsertContractor({email, token}); toast('Token saved');
+    renderReviews(); renderProfileCard();
+  };
+  document.getElementById('c-email').addEventListener('input', ()=>{ renderReviews(); renderProfileCard(); });
+  document.getElementById('logout').onclick=()=>{ Auth.logout(); location='contractor-login.html'; };
+</script>
+</body></html>

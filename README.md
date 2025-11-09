@@ -1,11 +1,9 @@
-# FixMate — Smart Maintenance Assistant
-
-Static, Vercel-ready build.
-- Mega services grid + floating **chatbot** (on every page)
-- Quick lead form ➜ stored locally (demo)
-- Contractor signup (collects **Telegram ID**) and admin login
-- Contractor dashboard: paste **company token**, see **leads** & **latest reviews**
-- Client **reviews + ratings** page
-- No backend required — swap localStorage with your API later
-
-Deployed on: 2025-11-09
+# FixMate — Enhanced Frontend
+- Rich service bubbles with icons
+- Chatbot with human-like typing and animated sweeper mascot
+- Final choice of contractor in chat; notifications queued to Outbox for admin + contractor
+- Contractor signup supports logo upload & Telegram ID
+- Homepage shows approved contractor logos automatically (when token saved)
+- 50 demo reviews seeded
+- Static (no backend). Replace LocalStorage & Outbox with your API later.
+Built 2025-11-09
