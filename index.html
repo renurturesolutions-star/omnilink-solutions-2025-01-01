@@ -1,55 +1,59 @@
-
-<!doctype html><html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FixMate — Smart Maintenance Assistant</title>
-<link rel="stylesheet" href="assets/app.css">
-<meta name="description" content="The best & most affordable maintenance network in South Africa.">
-</head><body>
-<div class="nav">
-  <div class="logo"><div class="badge">FM</div> FixMate — Smart Maintenance Assistant</div>
-  <div>
-    <a class="btn" href="review.html">Reviews</a>
-    <a class="btn primary" href="contractor.html">📮 Join as Contractor</a>
-  </div>
-</div>
-
-<section class="hero container">
-  <div class="kicker">All trades • All industries • One network</div>
-  <h1>Choose the service that you need today!</h1>
-  <p>The Best & Most Affordable Maintenance Network in South Africa.</p>
-</section>
-
-<main class="container">
-  <div class="card" id="services"></div>
-
-  <div class="card" style="margin-top:18px">
-    <div class="section-title">Credited Websites (Approved Contractors)</div>
-    <div id="credits" class="logo-grid"></div>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FixMate — Smart Maintenance Assistant</title>
+  <link rel="stylesheet" href="assets/app.css">
+  <meta name="description" content="The best & most affordable maintenance network in South Africa.">
+</head>
+<body>
+  <div class="nav">
+    <div class="logo"><div class="badge">FM</div> FixMate — Smart Maintenance Assistant</div>
+    <div>
+      <a class="btn" href="review.html">Reviews</a>
+      <a class="btn primary" href="contractor.html">📮 Join as Contractor</a>
+    </div>
   </div>
 
-  <div class="card" style="margin-top:18px">
-    <div class="section-title">Latest Reviews</div>
-    <div id="latest"></div>
-  </div>
-</main>
+  <section class="hero container">
+    <div class="kicker">All trades • All industries • One network</div>
+    <h1>Choose the service that you need today!</h1>
+    <p>The Best & Most Affordable Maintenance Network in South Africa.</p>
+  </section>
 
-<footer class="footer">© <span id="y"></span> FixMate • Built for speed on static hosting (Vercel)</footer>
+  <main class="container">
+    <div class="card" id="services"></div>
 
-<script src="assets/services.js"></script>
-<script src="assets/app.js"></script>
-<script>
-  renderServices(document.getElementById('services'));
-  function renderLatest(){
-    const el=document.getElementById('latest');
-    const rs=Reviews.all().slice(0,12);
-    el.innerHTML= rs.map(r=>`<div style="padding:10px;border-bottom:1px solid var(--border)">
-      <strong>${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</strong> — ${r.service||''}
-      <div class="small">${r.clientName||'Anonymous'} • ${r.contractorEmail} • ${pretty(r.ts)}</div>
-      <div>${r.text||''}</div>
-    </div>`).join('');
-  }
-  renderLatest();
-  renderCredits(document.getElementById('credits'));
-  document.getElementById('y').textContent=new Date().getFullYear();
-</script>
-</body></html>
+    <div class="card" style="margin-top:18px">
+      <div class="section-title">Credited Websites (Approved Contractors)</div>
+      <div id="credits" class="logo-grid"></div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <div class="section-title">Latest Reviews</div>
+      <div id="latest"></div>
+    </div>
+  </main>
+
+  <footer class="footer">© <span id="y"></span> FixMate • Built for speed on static hosting (Vercel)</footer>
+
+  <script src="assets/services.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    renderServices(document.getElementById('services'));
+
+    function renderLatest(){
+      const el=document.getElementById('latest');
+      const rs=Reviews.all().slice(0,12);
+      el.innerHTML= rs.map(r=>`<div style="padding:10px;border-bottom:1px solid var(--border)">
+        <strong>${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</strong> — ${r.service||''}
+        <div class="small">${r.clientName||'Anonymous'} • ${r.contractorEmail} • ${pretty(r.ts)}</div>
+        <div>${r.text||''}</div>
+      </div>`).join('');
+    }
+    renderLatest();
+    renderCredits(document.getElementById('credits'));
+    document.getElementById('y').textContent=new Date().getFullYear();
+  </script>
+</body>
+</html>
