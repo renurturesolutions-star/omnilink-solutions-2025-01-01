@@ -1,68 +1,59 @@
-
-<!doctype html><html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Join FixMate — Contractor Onboarding</title>
-<link rel="stylesheet" href="assets/app.css">
-</head><body>
-<div class="nav">
-  <div class="logo"><div class="badge">FM</div> Contractors</div>
-  <div>
-    <a class="btn" href="index.html">Home</a>
-    <a class="btn primary" href="contractor-login.html">Admin Login</a>
-  </div>
-</div>
-
-<main class="container">
-  <div class="card">
-    <div class="section-title">Join the network</div>
-    <div class="small">Upload your logo and add your Telegram username/ID. After approval, we email your personal bot token. Once you paste the token in your dashboard, your logo will appear on our home page.</div>
-    <div class="row">
-      <div class="stack">
-        <label class="small">Business Name</label><input id="biz" class="input">
-        <label class="small">Owner Full Name</label><input id="owner" class="input">
-        <label class="small">Email</label><input id="email" class="input">
-      </div>
-      <div class="stack">
-        <label class="small">Phone</label><input id="phone" class="input">
-        <label class="small">Primary Service</label><input id="primary" class="input" placeholder="e.g., Plumbing">
-        <label class="small">Areas Covered</label><input id="areas" class="input" placeholder="e.g., Durban North, Umhlanga">
-      </div>
-    </div>
-    <div class="row" style="margin-top:10px">
-      <div class="stack">
-        <label class="small">Telegram Username or ID</label><input id="telegram" class="input" placeholder="@yourhandle or numeric ID">
-      </div>
-      <div class="stack">
-        <label class="small">Company Logo (PNG/JPG)</label><input id="logo" type="file" accept="image/*" class="input">
-      </div>
-    </div>
-    <div class="stack" style="margin-top:10px">
-      <label class="small">About your company</label><textarea id="about" class="input" rows="2"></textarea>
-    </div>
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
-      <button class="btn" onclick="location='contractor-login.html'">I already have an account</button>
-      <button class="btn primary" id="apply">Apply</button>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FixMate — Smart Maintenance Assistant</title>
+  <link rel="stylesheet" href="assets/app.css">
+  <meta name="description" content="The best & most affordable maintenance network in South Africa.">
+</head>
+<body>
+  <div class="nav">
+    <div class="logo"><div class="badge">FM</div> FixMate — Smart Maintenance Assistant</div>
+    <div>
+      <a class="btn" href="review.html">Reviews</a>
+      <a class="btn primary" href="contractor.html">📮 Join as Contractor</a>
     </div>
   </div>
-</main>
 
-<script src="assets/app.js"></script>
-<script>
-  document.getElementById('apply').onclick=async()=>{
-    const file = document.getElementById('logo').files[0];
-    let logoData = '';
-    if(file){
-      const buf = await file.arrayBuffer();
-      const base64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
-      logoData = `data:${file.type};base64,${base64}`;
+  <section class="hero container">
+    <div class="kicker">All trades • All industries • One network</div>
+    <h1>Choose the service that you need today!</h1>
+    <p>The Best & Most Affordable Maintenance Network in South Africa.</p>
+  </section>
+
+  <main class="container">
+    <div class="card" id="services"></div>
+
+    <div class="card" style="margin-top:18px">
+      <div class="section-title">Credited Websites (Approved Contractors)</div>
+      <div id="credits" class="logo-grid"></div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <div class="section-title">Latest Reviews</div>
+      <div id="latest"></div>
+    </div>
+  </main>
+
+  <footer class="footer">© <span id="y"></span> FixMate • Built for speed on static hosting (Vercel)</footer>
+
+  <script src="assets/services.js"></script>
+  <script src="assets/app.js"></script>
+  <script>
+    renderServices(document.getElementById('services'));
+
+    function renderLatest(){
+      const el=document.getElementById('latest');
+      const rs=Reviews.all().slice(0,12);
+      el.innerHTML= rs.map(r=>`<div style="padding:10px;border-bottom:1px solid var(--border)">
+        <strong>${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</strong> — ${r.service||''}
+        <div class="small">${r.clientName||'Anonymous'} • ${r.contractorEmail} • ${pretty(r.ts)}</div>
+        <div>${r.text||''}</div>
+      </div>`).join('');
     }
-    const c={ id:crypto.randomUUID(), ts:Date.now(), status:'Pending',
-      biz:biz.value.trim(), owner:owner.value.trim(), email:email.value.trim(), phone:phone.value.trim(),
-      primary:primary.value.trim(), areas:areas.value.trim(), telegram:telegram.value.trim(),
-      about:about.value.trim(), token:'', logoData
-    };
-    upsertContractor(c);
-    toast('Application submitted. We will email your token after approval.');
-  };
-</script>
-</body></html>
+    renderLatest();
+    renderCredits(document.getElementById('credits'));
+    document.getElementById('y').textContent=new Date().getFullYear();
+  </script>
+</body>
+</html>
