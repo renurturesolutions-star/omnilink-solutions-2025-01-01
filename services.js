@@ -1,4 +1,3 @@
-
 // Expanded service catalog with icons
 const SERVICE_CATALOG = [
   {cat:"Home & Maintenance", items:[
@@ -25,7 +24,7 @@ const SERVICE_CATALOG = [
     ["Scaffolding Hire","🪜"],["Health & Safety","🦺"]
   ]},
   {cat:"IT & Digital", items:[
-    ["Computer Repairs","🖥️"],["Network Cabling","🧵"],["Wi‑Fi Optimization","📶"],["Fibre & LTE Setup","🛰️"],
+    ["Computer Repairs","🖥️"],["Network Cabling","🧵"],["Wi-Fi Optimization","📶"],["Fibre & LTE Setup","🛰️"],
     ["Web Design","🕸️"],["App Development","📱"],["SEO & Marketing","📈"],["Cybersecurity Assessments","🛡️"],
     ["POS Systems","🧾"],["Data Recovery","💾"]
   ]},
