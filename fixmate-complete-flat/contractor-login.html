@@ -1,0 +1,35 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FixMate Admin Login</title>
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+  <div class="nav">
+    <div class="logo"><div class="badge">FM</div> Admin</div>
+    <div><a class="btn" href="index.html">Home</a></div>
+  </div>
+
+  <main class="container">
+    <div class="card" style="max-width:600px;margin:0 auto">
+      <div class="section-title">Sign in</div>
+      <div class="stack">
+        <div><div class="small">Email</div><input id="email" class="input" placeholder="admin@example.com"></div>
+        <div><div class="small">Password</div><input id="pwd" type="password" class="input" placeholder="••••••••"></div>
+        <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="login">Login</button></div>
+      </div>
+      <div class="small" style="margin-top:10px">Demo auth — any email & 4+ char password.</div>
+    </div>
+  </main>
+
+  <script src="assets/app.js"></script>
+  <script>
+    document.getElementById('login').onclick=()=>{
+      const ok=Auth.login(email.value,pwd.value);
+      if(ok) location='contractor-dashboard.html'; else toast('Invalid login');
+    };
+  </script>
+</body>
+</html>
